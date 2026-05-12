@@ -65,6 +65,16 @@ public class ChannelHandler {
 			// put them into outgoing buffer.
 			if (readLength < header.getDataLength()) {
 				int read = bis.read(bytes);
+				if (read == -1) {
+					readLength = 0;
+					bis.close();
+					bis = null;
+					inBuf.clear();
+					outBuf.clear();
+					state = State.IDLE;
+					channel.register(selector, SelectionKey.OP_READ);
+					break;
+				}
 				outBuf.clear();
 				outBuf.put(bytes, 0, read);
 				outBuf.flip();

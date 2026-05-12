@@ -26,19 +26,19 @@ public class FileServer extends NIOServer {
 
 	@Override
 	protected void handleClient(SelectionKey key) throws IOException {
-		ChannelHandler hanlder = clients.get(key.channel());
-		if (hanlder == null) {
+		ChannelHandler handler = clients.get(key.channel());
+		if (handler == null) {
 			throw new IllegalStateException("unknown client");
 		}
 		try {
 			if(key.isWritable()) {
-				hanlder.send();
+				handler.send();
 			}
 			if (key.isReadable()) {
-				hanlder.recv();
+				handler.recv();
 			}	
 		} catch (IOException e) {
-			hanlder.closeIOStream();
+			handler.closeIOStream();
 			System.out.println("remove client: " + key.channel());
 			clients.remove(key.channel());
 			key.channel().close();
@@ -48,11 +48,11 @@ public class FileServer extends NIOServer {
 
 	@Override
 	protected void registeredClient(SocketChannel sc) throws IOException {
-		ChannelHandler hanlder = new ChannelHandler();
-		hanlder.setChannel(sc);
-		hanlder.setRoot(getRoot());
-		hanlder.setSelector(getSelector());
-		clients.put(sc, hanlder);
+		ChannelHandler handler = new ChannelHandler();
+		handler.setChannel(sc);
+		handler.setRoot(getRoot());
+		handler.setSelector(getSelector());
+		clients.put(sc, handler);
 	}
 
 	public File getRoot() {

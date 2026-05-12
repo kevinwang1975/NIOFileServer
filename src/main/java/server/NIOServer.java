@@ -33,7 +33,9 @@ public abstract class NIOServer implements Runnable {
 
 	protected synchronized void stopServer() throws IOException {
 		stop = true;
-		channel.close();
+		if (channel != null) {
+			channel.close();
+		}
 	}
 
 	public void run() {

@@ -44,6 +44,9 @@ public class AppUtil {
 		if (dir != null) {
 			String dirPath = dir.getCanonicalPath();
 			String filePath = file.getCanonicalPath();
+			if (filePath.length() <= dirPath.length()) {
+				return new String[0];
+			}
 			String subpath = filePath.substring(dirPath.length() + 1);
 			String[] path = subpath.split(File.separator);
 			return path;
@@ -96,9 +99,11 @@ public class AppUtil {
 	public static boolean delete(File file) {
 		if (file.isDirectory()) {
 			File[] files = file.listFiles();
-			for(File f : files) {
-				if (!delete(f)) {
-					return false;
+			if (files != null) {
+				for(File f : files) {
+					if (!delete(f)) {
+						return false;
+					}
 				}
 			}
 		}
@@ -201,7 +206,7 @@ public class AppUtil {
 			int b = bytes[index++];
 			b = (b < 0) ? b + 256 : b;
 			int shiftBits = Byte.SIZE*(typeBytes - i - 1);
-			val += (b << shiftBits);
+			val += ((long)b << shiftBits);
 		}
 		return val;
 	}
@@ -317,7 +322,12 @@ public class AppUtil {
 	 * @throws IOException
 	 */
 	public static boolean isLocatedInside(File file, File dir) throws IOException {
-		return file.getCanonicalPath().startsWith(dir.getCanonicalPath());
+		String filePath = file.getCanonicalPath();
+		String dirPath = dir.getCanonicalPath();
+		if (filePath.equals(dirPath)) {
+			return true;
+		}
+		return filePath.startsWith(dirPath + File.separator);
 	}
 	
 	public static void close(Closeable io) {
